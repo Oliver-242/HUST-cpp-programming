@@ -1,0 +1,119 @@
+main.cpp
+#include"QUEUE.h"
+
+extern const char* TestQUEUE(int& s);	//用于实验二，可以放在主函数之前
+
+int main(int argc, char* argv[]) {
+	int s;
+	const char* e = TestQUEUE(s);
+	cout << s << " " << e << endl;
+	return 0;
+}
+
+
+functions.cpp
+#include"QUEUE.h"
+
+QUEUE::QUEUE(int m) : elems(new int[m]), max(m) {
+	head = tail = 0;
+}
+
+QUEUE::QUEUE(const QUEUE& q) :elems(new int[q.max]), max(q.max) {
+	memcpy(elems, q.elems, max * sizeof(int));
+	head = q.head;
+	tail = q.tail;
+}
+
+QUEUE::QUEUE(QUEUE&& q) noexcept : elems(q.elems), max(q.max) {
+	head = q.head;
+	tail = q.tail;
+	(int*&)q.elems = nullptr;
+	(int&)q.max = 0;
+	q.head = q.tail = 0;
+}
+
+QUEUE::operator int() const noexcept {
+	if (max == 0) return 0;
+	return int((tail - head + max) % max);
+}
+
+int QUEUE::size() const noexcept
+{
+	return max;
+}
+
+QUEUE& QUEUE::operator<<(int e) {
+	if (head == (tail + 1) % max) throw("QUEUE is full!");
+	elems[tail] = e;
+	tail = (tail + 1) % max;
+	return *this;
+}
+
+QUEUE& QUEUE::operator>>(int& e) {
+	if (head == tail) throw("QUEUE is empty!");
+	e = elems[head];
+	head = (head + 1) % max;
+	return *this;
+}
+
+QUEUE& QUEUE::operator=(const QUEUE& q) {
+	if (this == &q) return *this;
+	(int&)max = q.max;
+	head = q.head;
+	tail = q.tail;
+	(int*&)elems = new int[max];
+	memcpy(elems, q.elems, max * sizeof(int));
+	return *this;
+}
+
+QUEUE& QUEUE::operator=(QUEUE&& q) noexcept {
+	if (this == &q) return *this;
+	(int&)max = q.max;
+	head = q.head;
+	tail = q.tail;
+	(int*&)elems = q.elems;
+	(int*&)q. elems = nullptr;
+	(int&)q.max = 0;
+	q.head = q.tail = 0;
+	return *this;
+}
+
+char* QUEUE::print(char* s) const noexcept {
+	for (int i = head; i != tail; i = (i + 1) % max) {
+		s = s + sprintf(s, "%d,", elems[i]);
+	}
+	return s;
+}
+
+QUEUE::~QUEUE() {
+	if (elems != nullptr) {
+		delete [] elems;
+		(int*&)elems = nullptr;
+		(int&)max = 0;
+		head = tail = 0;
+	}
+}
+
+
+QUEUE.h
+#define _CRT_SECURE_NO_WARNINGS 
+#include <iostream>
+#include <string.h>
+using namespace std;
+class QUEUE {
+    int* const  elems;	//elems申请内存用于存放队列的元素
+    const  int  max;	//elems申请的最大元素个数为max
+    int   head, tail;	 	//队列头head和尾tail，队空head=tail;初始head=tail=0
+public:
+    QUEUE(int m);		//初始化队列：最多申请m个元素
+    QUEUE(const QUEUE& q); 			//用q深拷贝初始化队列
+    QUEUE(QUEUE&& q)noexcept;		//用q移动初始化队列
+    virtual operator int() const noexcept;	//返回队列的实际元素个数
+    virtual int size() const noexcept;	
+    virtual QUEUE& operator<<(int e);  	//将e入队列尾部，并返回当前队列
+    virtual QUEUE& operator>>(int& e); 	//从队首出元素到e，并返回当前队列
+    virtual QUEUE& operator=(const QUEUE& q);//深拷贝赋值并返回被赋值队列
+    virtual QUEUE& operator=(QUEUE&& q)noexcept;//移动赋值并返回被赋值队列
+    virtual char* print(char* s) const noexcept;//打印队列至s并返回s
+    virtual ~QUEUE();	 					//销毁当前队列
+};
