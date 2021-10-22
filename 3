@@ -1,0 +1,231 @@
+main.cpp
+#include"Stack.h"
+
+extern const char* TestSTACK(int& s);	//用于实验三，可以放在主函数之前
+
+int main(int argc, char* argv[]) {
+	int s;
+	const char* e = TestSTACK(s);
+	cout << s << " " << e << endl;
+	return 0;
+}
+
+
+functions.cpp
+#include"Stack.h"
+
+QUEUE::QUEUE(int m) : elems(new int[m]), max(m) {
+	head = tail = 0;
+}
+
+QUEUE::QUEUE(const QUEUE& q) : elems(new int[q.max]), max(q.max) {
+	memcpy(elems, q.elems, max * sizeof(int));
+	head = q.head;
+	tail = q.tail;
+}
+
+QUEUE::QUEUE(QUEUE&& q) noexcept : elems(q.elems), max(q.max) {
+	head = q.head;
+	tail = q.tail;
+	(int*&)q.elems = nullptr;
+	(int&)q.max = 0;
+	q.head = q.tail = 0;
+}
+
+QUEUE::operator int() const noexcept {
+	if (max == 0) return 0;
+	return int((tail - head + max) % max);
+}
+
+int QUEUE::size() const noexcept
+{
+	return max;
+}
+
+QUEUE& QUEUE::operator<<(int e) {
+	if (head == (tail + 1) % max) throw("QUEUE is full!");
+	elems[tail] = e;
+	tail = (tail + 1) % max;
+	return *this;
+}
+
+QUEUE& QUEUE::operator>>(int& e) {
+	if (head == tail) throw("QUEUE is empty!");
+	e = elems[head];
+	head = (head + 1) % max;
+	return *this;
+}
+
+QUEUE& QUEUE::operator=(const QUEUE& q) {
+	if (this == &q) return *this;
+	(int&)max = q.max;
+	head = q.head;
+	tail = q.tail;
+	(int*&)elems = new int[max];
+	memcpy(elems, q.elems, max * sizeof(int));
+	return *this;
+}
+
+QUEUE& QUEUE::operator=(QUEUE&& q) noexcept {
+	if (this == &q) return *this;
+	(int&)max = q.max;
+	head = q.head;
+	tail = q.tail;
+	(int*&)elems = q.elems;
+	(int*&)q.elems = nullptr;
+	(int&)q.max = 0;
+	q.head = q.tail = 0;
+	return *this;
+}
+
+char* QUEUE::print(char* s) const noexcept {
+	for (int i = head; i != tail; i = (i + 1)%max) {
+		s = s + sprintf(s, "%d", elems[i]);
+		if ((i + 1) % max == tail) {
+			s += sprintf(s, "%c", '\0');
+		}
+		else {
+			s += sprintf(s, "%c", ',');
+		}
+	}
+	return s;
+}
+
+QUEUE::~QUEUE() {
+	if (elems != nullptr) {
+		delete[] elems;
+		(int*&)elems = nullptr;
+		(int&)max = 0;
+		head = tail = 0;
+	}
+}
+
+STACK::STACK(int m) : QUEUE(m), q(m) {
+
+}
+
+STACK::STACK(const STACK& s) : QUEUE(s), q(s.q) {
+
+}
+
+STACK::STACK(STACK&& s) noexcept : QUEUE((QUEUE&&)s), q((QUEUE&&)s.q) {
+
+}
+
+int STACK::size() const noexcept {
+	return QUEUE::size() * 2;
+}
+
+STACK::operator int() const noexcept {
+	return QUEUE::operator int() + int(q);
+}
+
+STACK& STACK::operator<<(int e) {
+	if (operator int() >= size() - 2) throw("STACK is full!");
+	else if (QUEUE::operator int() == QUEUE::size() - 1) {
+		int trans;
+		QUEUE::operator>>(trans);
+		q << trans;
+	}
+	QUEUE::operator<<(e);
+	return *this;
+}
+
+STACK& STACK::operator>>(int& e) {
+	if (operator int() == 0) throw("STACK is empty!");
+	int i, trans;
+	for (i = 1; i <= QUEUE::operator int() - 1; i++) {    //实现将队尾元素移至对头保持其他元素顺序不变
+		QUEUE::operator>>(trans);
+		QUEUE::operator<<(trans);
+	}
+	QUEUE::operator>>(e);
+	if (int(q) != 0) {
+		for (i = 1; i <= int(q) - 1; i++) {
+			q >> (trans);
+			q << (trans);
+		}
+		q >> trans;     //取出子类队列的队尾
+		QUEUE::operator<<(trans);
+		for (i = 1; i <= QUEUE::operator int() - 1; i++) {    //调整顺序
+			QUEUE::operator>>(trans);
+			QUEUE::operator<<(trans);
+		}
+	}
+	return *this;
+}
+
+STACK& STACK::operator=(const STACK& s) {
+	q = s.q;
+	QUEUE::operator=(s);
+	return *this;
+}
+
+STACK& STACK::operator=(STACK&& s) noexcept {
+	q = (QUEUE&&)s.q;
+	QUEUE::operator=((QUEUE&&)s);
+	return *this;
+}
+
+char* STACK::print(char* b) const noexcept {
+	if (int(q) != 0)
+	{
+		q.print(b);
+		int len = strlen(b);
+		b[len] = ',';
+		QUEUE::print(b + len + 1);
+	}
+	else
+	{
+		QUEUE::print(b);
+	}
+	return b;
+}
+
+STACK::~STACK() noexcept {
+	QUEUE::~QUEUE();
+	q.~QUEUE();
+}
+
+
+Stack.h
+#define _CRT_SECURE_NO_WARNINGS 
+
+
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+
+class QUEUE {
+    int* const  elems;	//elems申请内存用于存放队列的元素
+    const  int  max;	//elems申请的最大元素个数为max
+    int   head, tail;	 	//队列头head和尾tail，队空head=tail;初始head=tail=0
+public:
+    QUEUE(int m);		//初始化队列：最多申请m个元素
+    QUEUE(const QUEUE& q); 			//用q深拷贝初始化队列
+    QUEUE(QUEUE&& q)noexcept;		//用q移动初始化队列
+    virtual operator int() const noexcept;	//返回队列的实际元素个数
+    virtual int size() const noexcept;
+    virtual QUEUE& operator<<(int e);  	//将e入队列尾部，并返回当前队列
+    virtual QUEUE& operator>>(int& e); 	//从队首出元素到e，并返回当前队列
+    virtual QUEUE& operator=(const QUEUE& q);//深拷贝赋值并返回被赋值队列
+    virtual QUEUE& operator=(QUEUE&& q)noexcept;//移动赋值并返回被赋值队列
+    virtual char* print(char* s) const noexcept;//打印队列至s并返回s
+    virtual ~QUEUE();	 					//销毁当前队列
+};
+
+class STACK : public QUEUE {
+    QUEUE q;
+public:
+    STACK(int m);                    		//初始化栈：最多存放2m-2个元素
+    STACK(const STACK& s);         		//用栈s深拷贝初始化栈
+    STACK(STACK&& s)noexcept;     		//用栈s移动拷贝初始化栈
+    int  size()const noexcept;		  		//返回栈的容量即2m
+    operator int() const noexcept;	   		//返回栈的实际元素个数
+    STACK& operator<<(int e); 	     		//将e入栈，并返回当前栈
+    STACK& operator>>(int& e);     		//出栈到e，并返回当前栈
+    STACK& operator=(const STACK& s);	//深拷贝赋值并返回被赋值栈
+    STACK& operator=(STACK&& s)noexcept;//移动赋值并返回被赋值栈
+    char* print(char* b)const noexcept;	//从栈底到栈顶打印栈元素 
+    ~STACK()noexcept;	              	//销毁栈
+};
