@@ -1,61 +1,3 @@
-main.cpp
-#include"Mat.h"
-
-extern const char* TestMAT(int& s);	//ç”¨äºå®éªŒå››ï¼Œå¯ä»¥æ”¾åœ¨ä¸»å‡½æ•°ä¹‹å‰
-
-int main(int argc, char* argv[]) 					//è¯·æ‰©å±•main()æµ‹è¯•å…¶ä»–è¿ç®—
-{
-	//MAT<float>   a(1, 2), b(2, 2), c(1, 2);   //æ›´æ”¹æ¨¡æ¿ä¸­å…ƒç´ ç±»å‹å³å¯æµ‹è¯•å…¶ä»–æƒ…å†µ
-
-	//d[0][0] = 6; d[0][1] = 8;
-	//char t[2048];
-	//a[0][0] = 1.0; a[0][1] = 2.0; 			//ç­‰ä»·äºâ€œ*(a.operator[ ](0)+1)=2;â€å³ç­‰ä»·äºâ€œ*(a[0]+1)=2;â€
-
-	//b[0][0] = 3; 	b[0][1] = 4;		//è°ƒç”¨T* const operator[ ](int r)åˆå§‹åŒ–æ•°ç»„å…ƒç´ 
-	//b[1][0] = 5; 	b[1][1] = 6;
-
-	//c[0][0] = 2; c[0][1] = 3;
-
-	//cout << "åˆå§‹ä¸¤ä¸ªçŸ©é˜µ" << endl;
-	//cout << "a" << endl;
-	//cout << a.print(t) << endl;
-	//cout << "b" << endl;
-	//cout << b.print(t) << endl;
-
-	//cout << "ä¹˜æ³•æµ‹è¯•" << endl;
-	//c = a * b;						//æµ‹è¯•çŸ©é˜µä¹˜æ³•è¿ç®—
-	//cout << c.print(t) << endl;
-
-	//cout << "*=æµ‹è¯•" << endl;
-	//a *= b;
-	//cout<<a.print(t)<<endl;
-
-	//cout << "åŠ æ³•æµ‹è¯•" << endl;
-	//a = a + c;
-	//cout<<a.print(t)<<endl;					//æµ‹è¯•çŸ©é˜µåŠ æ³•è¿ç®—
-	//cout << "+=æµ‹è¯•" << endl;
-	//c += a;							//æµ‹è¯•çŸ©é˜µâ€œ+=â€è¿ç®—
-	//cout<<c.print(t)<<endl;
-	//
-	//cout << "å‡æ³•æµ‹è¯•" << endl;
-	//c = c - a;						//æµ‹è¯•çŸ©é˜µå‡æ³•è¿ç®—
-	//cout<<c.print(t)<<endl;
-	//cout << "-=æµ‹è¯•" << endl;
-	//c -= a;
-	//cout << c.print(t) << endl;
-	//
-	//cout << "è½¬ç½®æµ‹è¯•" << endl;
-	//c = ~b;							//æµ‹è¯•çŸ©é˜µè½¬ç½®è¿ç®—
-	//cout<<c.print(t)<<endl;
-
-	int s;
-	const char* e = TestMAT(s);
-	cout << s << " " << e << endl;
-	return 0;
-}
-
-
-Mat.h
 #define _CRT_SECURE_NO_WARNINGS 
 
 
@@ -69,24 +11,24 @@ using namespace std;
 
 template <typename T>
 class MAT {
-	T* const e;							//æŒ‡å‘æ‰€æœ‰æ•´å‹çŸ©é˜µå…ƒç´ çš„æŒ‡é’ˆ
-	const int r, c;							//çŸ©é˜µçš„è¡Œrå’Œåˆ—cå¤§å°
+	T* const e;							//Ö¸ÏòËùÓĞÕûĞÍ¾ØÕóÔªËØµÄÖ¸Õë
+	const int r, c;							//¾ØÕóµÄĞĞrºÍÁĞc´óĞ¡
 public:
-	MAT(int r, int c);						//çŸ©é˜µå®šä¹‰
-	MAT(const MAT& a);				//æ·±æ‹·è´æ„é€ 
-	MAT(MAT&& a)noexcept;			//ç§»åŠ¨æ„é€ 
+	MAT(int r, int c);						//¾ØÕó¶¨Òå
+	MAT(const MAT& a);				//Éî¿½±´¹¹Ôì
+	MAT(MAT&& a)noexcept;			//ÒÆ¶¯¹¹Ôì
 	virtual ~MAT()noexcept;
-	virtual T* const operator[ ](int r);//å–çŸ©é˜µrè¡Œçš„ç¬¬ä¸€ä¸ªå…ƒç´ åœ°å€ï¼Œrè¶Šç•ŒæŠ›å¼‚å¸¸
-	virtual MAT operator+(const MAT& a)const;	//çŸ©é˜µåŠ æ³•ï¼Œä¸èƒ½åŠ æŠ›å¼‚å¸¸
-	virtual MAT operator-(const MAT& a)const;	//çŸ©é˜µå‡æ³•ï¼Œä¸èƒ½å‡æŠ›å¼‚å¸¸
-	virtual MAT operator*(const MAT& a)const;	//çŸ©é˜µä¹˜æ³•ï¼Œä¸èƒ½ä¹˜æŠ›å¼‚å¸¸
-	virtual MAT operator~()const;					//çŸ©é˜µè½¬ç½®
-	virtual MAT& operator=(const MAT& a);		//æ·±æ‹·è´èµ‹å€¼è¿ç®—
-	virtual MAT& operator=(MAT&& a)noexcept;	//ç§»åŠ¨èµ‹å€¼è¿ç®—
-	virtual MAT& operator+=(const MAT& a);		//â€œ+=â€è¿ç®—
-	virtual MAT& operator-=(const MAT& a);		//â€œ-=â€è¿ç®—
-	virtual MAT<T>& operator*=(const MAT& a);		//â€œ*=â€è¿ç®—
-	virtual char* print(char* s)const noexcept;     //printè¾“å‡ºè‡³så¹¶è¿”å›sï¼šåˆ—ç”¨ç©ºæ ¼éš”å¼€ï¼Œè¡Œç”¨å›è½¦ç»“æŸ
+	virtual T* const operator[ ](int r);//È¡¾ØÕórĞĞµÄµÚÒ»¸öÔªËØµØÖ·£¬rÔ½½çÅ×Òì³£
+	virtual MAT operator+(const MAT& a)const;	//¾ØÕó¼Ó·¨£¬²»ÄÜ¼ÓÅ×Òì³£
+	virtual MAT operator-(const MAT& a)const;	//¾ØÕó¼õ·¨£¬²»ÄÜ¼õÅ×Òì³£
+	virtual MAT operator*(const MAT& a)const;	//¾ØÕó³Ë·¨£¬²»ÄÜ³ËÅ×Òì³£
+	virtual MAT operator~()const;					//¾ØÕó×ªÖÃ
+	virtual MAT& operator=(const MAT& a);		//Éî¿½±´¸³ÖµÔËËã
+	virtual MAT& operator=(MAT&& a)noexcept;	//ÒÆ¶¯¸³ÖµÔËËã
+	virtual MAT& operator+=(const MAT& a);		//¡°+=¡±ÔËËã
+	virtual MAT& operator-=(const MAT& a);		//¡°-=¡±ÔËËã
+	virtual MAT<T>& operator*=(const MAT& a);		//¡°*=¡±ÔËËã
+	virtual char* print(char* s)const noexcept;     //printÊä³öÖÁs²¢·µ»Øs£ºÁĞÓÃ¿Õ¸ñ¸ô¿ª£¬ĞĞÓÃ»Ø³µ½áÊø
 };
 
 template<typename T>
@@ -109,7 +51,7 @@ MAT<T>::MAT(MAT&& a) noexcept : MAT::e((T*&&)a.e), MAT::c(a.c), MAT::r(a.r) {
 template<typename T>
 MAT<T>::~MAT() noexcept {
 	if (e != nullptr) {
-		delete [] e;
+		delete[] e;
 		(T*&)e = nullptr;
 		(int&)r = (int&)c = 0;
 	}
@@ -120,7 +62,7 @@ T* const MAT<T>::operator[](int r) {
 	if (r >= 0 && r < MAT::r) {
 		return &e[r * c];
 	}
-	else throw("rè¶…å‡ºäº†å–å€¼èŒƒå›´ï¼");
+	else throw("r³¬³öÁËÈ¡Öµ·¶Î§£¡");
 }
 
 template<typename T>
@@ -132,7 +74,7 @@ MAT<T> MAT<T>::operator+(const MAT& a) const {
 		}
 		return wuhu;
 	}
-	else throw("è¡Œåˆ—æ•°ä¸å®Œå…¨ç›¸åŒä¸èƒ½ç›¸åŠ ï¼");
+	else throw("ĞĞÁĞÊı²»ÍêÈ«ÏàÍ¬²»ÄÜÏà¼Ó£¡");
 }
 
 template<typename T>
@@ -144,7 +86,7 @@ MAT<T> MAT<T>::operator-(const MAT& a) const {
 		}
 		return wuhu;
 	}
-	else throw("è¡Œåˆ—æ•°ä¸å®Œå…¨ç›¸åŒä¸èƒ½ç›¸å‡ï¼");
+	else throw("ĞĞÁĞÊı²»ÍêÈ«ÏàÍ¬²»ÄÜÏà¼õ£¡");
 }
 
 template<typename T>
@@ -163,7 +105,7 @@ MAT<T> MAT<T>::operator*(const MAT& a) const {
 		}
 		return wuhu;
 	}
-	else throw("å·¦çŸ©é˜µåˆ—æ•°ä¸ç­‰äºå³çŸ©é˜µè¡Œæ•°ä¸èƒ½ç›¸ä¹˜ï¼");
+	else throw("×ó¾ØÕóÁĞÊı²»µÈÓÚÓÒ¾ØÕóĞĞÊı²»ÄÜÏà³Ë£¡");
 }
 
 template<typename T>
@@ -191,7 +133,7 @@ MAT<T>& MAT<T>::operator=(const MAT& a) {
 }
 
 template<typename T>
-MAT<T>& MAT<T>::operator=(MAT&& a) noexcept{
+MAT<T>& MAT<T>::operator=(MAT&& a) noexcept {
 	if (this == &a) return a;
 	(int&)r = a.r;
 	(int&)c = a.c;
@@ -209,7 +151,7 @@ MAT<T>& MAT<T>::operator+=(const MAT& a) {
 		}
 		return *this;
 	}
-	else throw("è¡Œåˆ—æ•°ä¸å®Œå…¨ç›¸åŒä¸èƒ½ç›¸åŠ ï¼");
+	else throw("ĞĞÁĞÊı²»ÍêÈ«ÏàÍ¬²»ÄÜÏà¼Ó£¡");
 }
 
 template<typename T>
@@ -220,7 +162,7 @@ MAT<T>& MAT<T>::operator-=(const MAT& a) {
 		}
 		return *this;
 	}
-	else throw("è¡Œåˆ—æ•°ä¸å®Œå…¨ç›¸åŒä¸èƒ½ç›¸å‡ï¼");
+	else throw("ĞĞÁĞÊı²»ÍêÈ«ÏàÍ¬²»ÄÜÏà¼õ£¡");
 }
 
 template<typename T>
@@ -241,7 +183,7 @@ MAT<T>& MAT<T>::operator*=(const MAT& a) {
 		wuhu.~MAT();
 		return *this;
 	}
-	else throw("å·¦çŸ©é˜µåˆ—æ•°ä¸ç­‰äºå³çŸ©é˜µè¡Œæ•°ä¸èƒ½ç›¸ä¹˜ï¼");
+	else throw("×ó¾ØÕóÁĞÊı²»µÈÓÚÓÒ¾ØÕóĞĞÊı²»ÄÜÏà³Ë£¡");
 }
 
 template<typename T>
@@ -257,7 +199,7 @@ char* MAT<T>::print(char* s) const noexcept {
 				s += sprintf(s, "%8lf", this->e[i * this->c + j]);
 			else if (!strcmp(typeid(T).name(), "float"))
 				s += sprintf(s, "%8f", this->e[i * this->c + j]);
-			
+
 			if (j + 1 != this->c) s += sprintf(s, "%c", ' ');
 		}
 		s += sprintf(s, "%c", '\n');
@@ -267,5 +209,5 @@ char* MAT<T>::print(char* s) const noexcept {
 }
 
 
-template MAT<int>;			//ç”¨äºå®éªŒå››ï¼Œå¿…é¡»æ”¾åœ¨æ¨¡æ¿å®šä¹‰æ–‡ä»¶çš„å°¾éƒ¨ï¼Œç”¨äºå¼ºåˆ¶å®ä¾‹åŒ–
-template MAT<long long>;		//ç”¨äºå®éªŒå››ï¼Œå¿…é¡»æ”¾åœ¨æ¨¡æ¿å®šä¹‰æ–‡ä»¶çš„å°¾éƒ¨ï¼Œç”¨äºå¼ºåˆ¶å®ä¾‹åŒ–
+template MAT<int>;			//ÓÃÓÚÊµÑéËÄ£¬±ØĞë·ÅÔÚÄ£°å¶¨ÒåÎÄ¼şµÄÎ²²¿£¬ÓÃÓÚÇ¿ÖÆÊµÀı»¯
+template MAT<long long>;		//ÓÃÓÚÊµÑéËÄ£¬±ØĞë·ÅÔÚÄ£°å¶¨ÒåÎÄ¼şµÄÎ²²¿£¬ÓÃÓÚÇ¿ÖÆÊµÀı»¯
